@@ -1,13 +1,7 @@
 import { type APIRequestContext, type APIResponse } from '@playwright/test';
+import { type Booking } from './schemas';
 
-export interface Booking {
-  firstname: string;
-  lastname: string;
-  totalprice: number;
-  depositpaid: boolean;
-  bookingdates: { checkin: string; checkout: string };
-  additionalneeds?: string;
-}
+export type { Booking };
 
 // Public demo credentials from the Restful Booker documentation.
 const ADMIN = { username: 'admin', password: 'password123' };

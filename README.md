@@ -17,9 +17,9 @@ running in **Chromium, Firefox and WebKit** on every push.
 | **Login** | valid user, locked-out user, empty / wrong credentials (data-driven), redirect from protected pages |
 | **Products** | product count, sorting by name and price, cart badge when adding / removing |
 | **Checkout** | cart contents, full order with total = items + tax, required customer fields (data-driven) |
-| **Booking API** | create → read, search by name, update → partial update → delete, auth errors |
+| **Booking API** | create → read, search by name, update → partial update → delete, auth errors, **response contracts (JSON schema)** |
 
-16 UI tests × 3 browsers + 5 API tests + 1 login setup = **54 test runs**.
+16 UI tests × 3 browsers + 7 API tests + 1 login setup = **56 test runs**.
 
 ## How it is built
 
@@ -28,6 +28,8 @@ playwright.config.ts   projects: setup → chromium / firefox / webkit, plus api
 src/pages/             Page Objects (LoginPage, InventoryPage, CartPage, CheckoutPage)
 src/fixtures.ts        custom `test` that hands page objects to tests
 src/api/BookingApi.ts  small typed API client + test data builder
+src/api/schemas.ts     response contracts (zod); the Booking type is derived from them
+src/api/contract.ts    matchesSchema(): validates a response and returns it typed
 src/data/              demo users and customer data
 tests/setup/           logs in once and saves the session (storageState)
 tests/ui/              UI specs
@@ -42,6 +44,9 @@ Techniques worth a look:
 - **Page Objects as fixtures.** Tests ask for `loginPage`, `cartPage`… instead of creating them.
 - **Stable locators.** `data-test` attributes via `testIdAttribute`, role-based buttons, no CSS chains.
 - **Data-driven tests** for negative cases (one loop, one test per case in the report).
+- **Contract tests for the API.** Every response is validated against a [zod](https://zod.dev) schema:
+  field types, ISO dates, and no unexpected extra fields. A failure lists each broken field.
+  A separate test proves the check really catches a broken response.
 - **Independent API data.** Every test creates its own booking with a unique name, so tests run in parallel safely.
 - **Debuggable failures.** Trace, screenshot and video are kept for failed tests and open from the report.
 
